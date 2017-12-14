@@ -24,7 +24,10 @@ def prepro(paragraph, question):
     cy = []
     x, cx = [], []
     answerss = []
-    
+
+    paragraph = paragraph.replace("''", '" ')
+    paragraph = paragraph.replace("``", '" ')
+
     xi = [word_tokenize(paragraph)]
     cxi = [[list(xij) for xij in xi]]
     qi = word_tokenize(question)

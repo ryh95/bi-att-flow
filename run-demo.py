@@ -1,7 +1,10 @@
+from collections import defaultdict
 from flask import Flask, render_template, redirect, request, jsonify
 from squad.demo_prepro import prepro
 from basic.demo_cli import Demo
 import json
+
+from squad.evaluate import f1_score
 
 app = Flask(__name__)
 shared = json.load(open("data/squad/shared_test.json", "r"))
@@ -49,4 +52,18 @@ def submit():
     return jsonify(result=answer)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="1995", threaded=True)
+    # app.run(host="0.0.0.0", port=1995, threaded=True)
+
+    # end to end test
+    C_Q_result_dict = defaultdict(list)
+    with open('merged_final_file.txt','r') as f:
+        for line in f:
+            q,c,a,_ = line.strip().split('\t')
+            a_hat = getAnswer(c,q)
+            f1 = f1_score(a_hat, a)
+            C_Q_result_dict[c+'\t'+q].append(f1)
+
+    f1_list = [max(v_list) for k,v_list in C_Q_result_dict.items()]
+    len_f1_list = len(f1_list)
+    print(len_f1_list)
+    print(sum(f1_list)/len_f1_list)
